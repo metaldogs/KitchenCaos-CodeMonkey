@@ -54,8 +54,9 @@ public class Player : MonoBehaviour, IKitchenParentObject
 
     private void Update()
     {
-        HandleMovement();
         HandleInteractions();
+        HandleMovement();
+
     }
 
     public bool IsWaking()
@@ -75,7 +76,7 @@ public class Player : MonoBehaviour, IKitchenParentObject
         if (!canMove)
         {
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
+            canMove = moveDirX.x != 0 && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
 
             if (canMove)
             {
@@ -84,7 +85,7 @@ public class Player : MonoBehaviour, IKitchenParentObject
             else
             {
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
-                canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
+                canMove = moveDirZ.x != 0 && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
 
                 if (canMove)
                 {
@@ -115,10 +116,12 @@ public class Player : MonoBehaviour, IKitchenParentObject
         {
             lastInteractionDir = moveDir;
         }
-
+        
         if (Physics.Raycast(transform.position, lastInteractionDir, out RaycastHit raycastHit, interactionDistance, countersLayerMask))
         {
-            if (raycastHit.transform.parent.TryGetComponent(out BaseCounter baseCounter))
+            print(raycastHit.transform.name);
+
+            if (raycastHit.transform.TryGetComponent(out BaseCounter baseCounter))
             {
                 if (baseCounter != selectedCounter)
                 {
